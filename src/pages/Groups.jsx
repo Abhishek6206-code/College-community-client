@@ -4,8 +4,7 @@ import AppContext from "../context/AppContext";
 import io from "socket.io-client";
 import axios from "axios";
 
-const API_BASE = "https://college-community-api.onrender.com";
-const socket = io(API_BASE);
+const socket = io("https://college-community-api.onrender.com");
 
 const Groups = () => {
   const {
@@ -73,7 +72,7 @@ const Groups = () => {
   const handleLeaveGroup = async (groupId) => {
     try {
       await axios.post(
-        `${API_BASE}/api/groups/${groupId}/leave`,
+        `https://college-community-api.onrender.com/api/groups/${groupId}/leave`,
         {},
         { headers: { Auth: appState.token } }
       );
@@ -90,7 +89,7 @@ const Groups = () => {
   const handleAcceptRequest = async (groupId, userId) => {
     try {
       await axios.post(
-        `${API_BASE}/api/groups/${groupId}/accept/${userId}`,
+        `https://college-community-api.onrender.com/api/groups/${groupId}/accept/${userId}`,
         {},
         { headers: { Auth: appState.token } }
       );
@@ -105,11 +104,11 @@ const Groups = () => {
   };
 
   const isMember = (group) =>
-    group.members?.some((m) => (m.user?._id || m.user?.id) === currentUserId);
+    group.members?.some((m) => m.user?._id === currentUserId);
 
   const isAdmin = (group) =>
     group.members?.some(
-      (m) => (m.user?._id || m.user?.id) === currentUserId && m.role === "admin"
+      (m) => m.user?._id === currentUserId && m.role === "admin"
     );
 
   const myGroups = appState.groups.filter((g) => isMember(g));
