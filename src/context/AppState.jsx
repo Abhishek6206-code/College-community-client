@@ -330,6 +330,62 @@ const AppState = ({ children }) => {
     }
   };
 
+  // NEW: uploadResource - sends multipart/form-data with field "file"
+  const uploadResource = async (resource) => {
+    if (!appState.token) {
+      alert("Login first");
+      return false;
+    }
+    try {
+      const fd = new FormData();
+      fd.append("title", resource.title);
+      fd.append("course", resource.course);
+      fd.append("year", resource.year);
+      fd.append("subject", resource.subject);
+      fd.append("type", resource.type || "notes");
+      fd.append("file", resource.file); // server expects "file"
+
+      const res = await axios.post(`${API_BASE}/api/resources`, fd, {
+        headers: {
+          Auth: appState.token,
+          // do NOT set Content-Type manually
+        },
+      });
+
+      if (res.data && res.data.resource) {
+        fetchResources();
+        return true;
+      } else {
+        alert(res.data.message || "Upload failed");
+        return false;
+      }
+    } catch (err) {
+      console.error("Upload resource error:", err);
+      alert("Upload failed: " + (err.response?.data?.message || err.message));
+      return false;
+    }
+  };
+
+  // NEW: deleteResource
+  const deleteResource = async (resourceId) => {
+    if (!appState.token) {
+      alert("Login first");
+      return false;
+    }
+    try {
+      const res = await axios.delete(`${API_BASE}/api/resources/${resourceId}`, {
+        headers: { Auth: appState.token },
+      });
+      alert(res.data.message || "Deleted");
+      fetchResources();
+      return true;
+    } catch (err) {
+      console.error("Delete resource error:", err);
+      alert("Delete failed: " + (err.response?.data?.message || err.message));
+      return false;
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -353,6 +409,8 @@ const AppState = ({ children }) => {
         removeMember,
         fetchMessages,
         sendMessage,
+        uploadResource,
+        deleteResource,
       }}
     >
       {children}
