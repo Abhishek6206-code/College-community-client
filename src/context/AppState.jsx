@@ -3,8 +3,7 @@ import axios from "axios";
 import AppContext from "./AppContext";
 import io from "socket.io-client";
 
-const API_BASE = "https://college-community-api.onrender.com";
-const socket = io(API_BASE);
+const socket = io("https://college-community-api.onrender.com");
 
 const AppState = ({ children }) => {
   const [appState, setAppState] = useState({
@@ -45,7 +44,7 @@ const AppState = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const res = await axios.post(`${API_BASE}/api/auth/login`, {
+      const res = await axios.post("https://college-community-api.onrender.com/api/auth/login", {
         email,
         password,
       });
@@ -72,7 +71,10 @@ const AppState = ({ children }) => {
 
   const signup = async (form) => {
     try {
-      const res = await axios.post(`${API_BASE}/api/auth/signup`, form);
+      const res = await axios.post(
+        "https://college-community-api.onrender.com/api/auth/signup",
+        form
+      );
       if (res.data.token) {
         const userData = normalizeUser(res.data.user);
         localStorage.setItem("token", res.data.token);
@@ -97,7 +99,7 @@ const AppState = ({ children }) => {
   const fetchProfile = async (token = appState.token) => {
     if (!token) return;
     try {
-      const res = await axios.get(`${API_BASE}/api/auth/profile`, {
+      const res = await axios.get("https://college-community-api.onrender.com/api/auth/profile", {
         headers: { Auth: token },
       });
       if (res.data && (res.data._id || res.data.id)) {
@@ -120,9 +122,11 @@ const AppState = ({ children }) => {
     }));
   };
 
+  // ✅ CLUBS =============================
+
   const fetchClubs = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/api/clubs`);
+      const res = await axios.get("https://college-community-api.onrender.com/api/clubs");
       setAppState((prev) => ({ ...prev, clubs: res.data || [] }));
     } catch (err) {
       console.error("Error fetching clubs:", err);
@@ -133,7 +137,7 @@ const AppState = ({ children }) => {
     if (!appState.token) return alert("Login first");
     try {
       const res = await axios.post(
-        `${API_BASE}/api/clubs/${clubId}/request`,
+        `https://college-community-api.onrender.com/api/clubs/${clubId}/request`,
         {},
         { headers: { Auth: appState.token } }
       );
@@ -148,7 +152,7 @@ const AppState = ({ children }) => {
     if (!appState.token) return alert("Login first");
     try {
       const res = await axios.post(
-        `${API_BASE}/api/clubs/${clubId}/accept/${userId}`,
+        `https://college-community-api.onrender.com/api/clubs/${clubId}/accept/${userId}`,
         {},
         { headers: { Auth: appState.token } }
       );
@@ -164,13 +168,13 @@ const AppState = ({ children }) => {
     if (!appState.token) return alert("Login first");
     try {
       const res = await axios.post(
-        `${API_BASE}/api/clubs/${clubId}/leave`,
+        `https://college-community-api.onrender.com/api/clubs/${clubId}/leave`,
         {},
         { headers: { Auth: appState.token } }
       );
       alert(res.data.message);
       fetchClubs();
-      fetchGroups();
+      fetchGroups(); // because leaving club also removes from group
     } catch (err) {
       console.error("Leave club error:", err);
     }
@@ -179,9 +183,10 @@ const AppState = ({ children }) => {
   const deleteClub = async (clubId) => {
     if (!appState.token) return alert("Login first");
     try {
-      const res = await axios.delete(`${API_BASE}/api/clubs/${clubId}`, {
-        headers: { Auth: appState.token },
-      });
+      const res = await axios.delete(
+        `https://college-community-api.onrender.com/api/clubs/${clubId}`,
+        { headers: { Auth: appState.token } }
+      );
       alert(res.data.message);
       fetchClubs();
       fetchGroups();
@@ -190,29 +195,34 @@ const AppState = ({ children }) => {
     }
   };
 
+  // ✅ EVENTS / RESOURCES =============================
+
   const fetchEvents = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/api/events`);
+      const res = await axios.get("https://college-community-api.onrender.com/api/events");
       setAppState((prev) => ({ ...prev, events: res.data || [] }));
     } catch (err) {
       console.error("Error fetching events:", err);
     }
   };
 
-  const fetchResources = async (filters = {}) => {
-    try {
-      const res = await axios.get(`${API_BASE}/api/resources`, {
-        params: filters,
-      });
-      setAppState((prev) => ({ ...prev, resources: res.data || [] }));
-    } catch (err) {
-      console.error("Error fetching resources:", err);
-    }
-  };
+ const fetchResources = async (filters = {}) => {
+  try {
+    const res = await axios.get("https://college-community-api.onrender.com/api/resources", {
+      params: filters,
+    });
+    setAppState((prev) => ({ ...prev, resources: res.data || [] }));
+  } catch (err) {
+    console.error("Error fetching resources:", err);
+  }
+};
+
+
+  // ✅ GROUPS =============================
 
   const fetchGroups = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/api/groups`);
+      const res = await axios.get("https://college-community-api.onrender.com/api/groups");
       setAppState((prev) => ({ ...prev, groups: res.data || [] }));
     } catch (err) {
       console.error("Error fetching groups:", err);
@@ -222,9 +232,13 @@ const AppState = ({ children }) => {
   const createGroup = async (groupData) => {
     if (!appState.token) return alert("Login first");
     try {
-      const res = await axios.post(`${API_BASE}/api/groups`, groupData, {
-        headers: { Auth: appState.token },
-      });
+      const res = await axios.post(
+        "https://college-community-api.onrender.com/api/groups",
+        groupData,
+        {
+          headers: { Auth: appState.token },
+        }
+      );
       if (res.data.group) {
         alert("Group created");
         fetchGroups();
@@ -243,7 +257,7 @@ const AppState = ({ children }) => {
     if (!appState.token) return alert("Login first");
     try {
       const res = await axios.post(
-        `${API_BASE}/api/groups/${groupId}/join`,
+        `https://college-community-api.onrender.com/api/groups/${groupId}/join`,
         {},
         { headers: { Auth: appState.token } }
       );
@@ -259,7 +273,7 @@ const AppState = ({ children }) => {
     if (!appState.token) return alert("Login first");
     try {
       const res = await axios.post(
-        `${API_BASE}/api/groups/${groupId}/leave`,
+        `https://college-community-api.onrender.com/api/groups/${groupId}/leave`,
         {},
         { headers: { Auth: appState.token } }
       );
@@ -275,7 +289,7 @@ const AppState = ({ children }) => {
     if (!appState.token) return alert("Login first");
     try {
       const res = await axios.post(
-        `${API_BASE}/api/groups/${groupId}/accept/${userId}`,
+        `https://college-community-api.onrender.com/api/groups/${groupId}/accept/${userId}`,
         {},
         { headers: { Auth: appState.token } }
       );
@@ -290,7 +304,7 @@ const AppState = ({ children }) => {
     if (!appState.token) return alert("Login first");
     try {
       const res = await axios.delete(
-        `${API_BASE}/api/groups/${groupId}/remove/${userId}`,
+        `https://college-community-api.onrender.com/api/groups/${groupId}/remove/${userId}`,
         { headers: { Auth: appState.token } }
       );
       alert(res.data.message);
@@ -300,11 +314,16 @@ const AppState = ({ children }) => {
     }
   };
 
+  // ✅ MESSAGES =============================
+
   const fetchMessages = async (groupId) => {
     try {
-      const res = await axios.get(`${API_BASE}/api/groups/${groupId}/messages`, {
-        headers: { Auth: appState.token },
-      });
+      const res = await axios.get(
+        `https://college-community-api.onrender.com/api/groups/${groupId}/messages`,
+        {
+          headers: { Auth: appState.token },
+        }
+      );
       return res.data;
     } catch (err) {
       console.error("Fetch messages error:", err);
@@ -327,62 +346,6 @@ const AppState = ({ children }) => {
     } catch (err) {
       console.error("Send message error:", err);
       return null;
-    }
-  };
-
-  // NEW: uploadResource - sends multipart/form-data with field "file"
-  const uploadResource = async (resource) => {
-    if (!appState.token) {
-      alert("Login first");
-      return false;
-    }
-    try {
-      const fd = new FormData();
-      fd.append("title", resource.title);
-      fd.append("course", resource.course);
-      fd.append("year", resource.year);
-      fd.append("subject", resource.subject);
-      fd.append("type", resource.type || "notes");
-      fd.append("file", resource.file); // server expects "file"
-
-      const res = await axios.post(`${API_BASE}/api/resources`, fd, {
-        headers: {
-          Auth: appState.token,
-          // do NOT set Content-Type manually
-        },
-      });
-
-      if (res.data && res.data.resource) {
-        fetchResources();
-        return true;
-      } else {
-        alert(res.data.message || "Upload failed");
-        return false;
-      }
-    } catch (err) {
-      console.error("Upload resource error:", err);
-      alert("Upload failed: " + (err.response?.data?.message || err.message));
-      return false;
-    }
-  };
-
-  // NEW: deleteResource
-  const deleteResource = async (resourceId) => {
-    if (!appState.token) {
-      alert("Login first");
-      return false;
-    }
-    try {
-      const res = await axios.delete(`${API_BASE}/api/resources/${resourceId}`, {
-        headers: { Auth: appState.token },
-      });
-      alert(res.data.message || "Deleted");
-      fetchResources();
-      return true;
-    } catch (err) {
-      console.error("Delete resource error:", err);
-      alert("Delete failed: " + (err.response?.data?.message || err.message));
-      return false;
     }
   };
 
@@ -409,8 +372,6 @@ const AppState = ({ children }) => {
         removeMember,
         fetchMessages,
         sendMessage,
-        uploadResource,
-        deleteResource,
       }}
     >
       {children}

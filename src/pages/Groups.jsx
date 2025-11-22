@@ -147,6 +147,7 @@ const Groups = () => {
               ➕ Create Group
             </button>
           </li>
+
           {selectedGroup && isMember(selectedGroup) && (
             <li className="nav-item">
               <button
@@ -159,6 +160,7 @@ const Groups = () => {
           )}
         </ul>
 
+        {/* Browse Groups */}
         {activeTab === "browse" && (
           <div className="row g-4">
             {browseGroups.length > 0 ? (
@@ -184,6 +186,7 @@ const Groups = () => {
           </div>
         )}
 
+        {/* My Groups */}
         {activeTab === "my" && (
           <div className="row g-4">
             {myGroups.length > 0 ? (
@@ -224,6 +227,7 @@ const Groups = () => {
           </div>
         )}
 
+        {/* Create Group */}
         {activeTab === "create" && (
           <form
             onSubmit={handleCreateGroup}
@@ -272,10 +276,12 @@ const Groups = () => {
           </form>
         )}
 
+        {/* CHAT */}
         {activeTab === "chat" && selectedGroup && isMember(selectedGroup) && (
           <div className="card p-3 shadow-sm">
             <h5 className="fw-bold mb-3">{selectedGroup.name} Chat</h5>
 
+            {/* JOIN REQUESTS (ADMIN ONLY) */}
             {isAdmin(selectedGroup) && selectedGroup.joinRequests?.length > 0 && (
               <div className="mb-3">
                 <h6 className="fw-bold mb-2">Join Requests</h6>
@@ -298,6 +304,7 @@ const Groups = () => {
               </div>
             )}
 
+            {/* MESSAGES */}
             <div
               style={{
                 maxHeight: "300px",
@@ -317,6 +324,7 @@ const Groups = () => {
               )}
             </div>
 
+            {/* SEND MESSAGE */}
             <div className="input-group">
               <input
                 type="text"

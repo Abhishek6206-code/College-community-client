@@ -77,7 +77,7 @@ const Clubs = () => {
     if (newClub.coverImage) formData.append("coverImage", newClub.coverImage);
 
     try {
-      const res = await fetch("http://localhost:3000/api/clubs", {
+      const res = await fetch("https://college-community-api.onrender.com/api/clubs", {
         method: "POST",
         headers: { Auth: appState.token },
         body: formData,
